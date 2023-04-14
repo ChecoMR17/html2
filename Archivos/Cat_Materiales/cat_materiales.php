@@ -40,7 +40,7 @@
             if (empty($Id_Mat)){
                 $insert = ejecutarConsulta("INSERT INTO Cat_Materiales (Cve_Mat,Desc_Mat,Tipo,Id_Fam,Id_Prov,Id_UM1,Id_UM2,Stock
                 ,Min,Max,Costo,Ganancia,Fec_Alta,Fec_Susp,Fec_Mod,U_Alta,U_Mod,Status) VALUES ('$Cve_Mat','$Desc_Mat','$Tipo','$Id_Fam','$Id_Prov'
-                ,'$Id_UM1','$Id_UM2','$Stock','$Max','$Min','$Costo', '$Ganancia','$Fecha',NULL,'$Fecha','$Id_User','$Id_User','A');");
+                ,'$Id_UM1','$Id_UM2','$Stock','$Min','$Max','$Costo', '$Ganancia','$Fecha',NULL,'$Fecha','$Id_User','$Id_User','A');");
 
                 echo $insert ? "El material se guardo correctamente" : "Ocurrió un error al guardar el material :(";
             } else {
@@ -82,10 +82,24 @@
 
 
                 $Ganancia = $rst->Costo * ($rst->Ganancia / 100);
+
                 $Gan = "$".number_format($Ganancia, 2);
                 $Por = number_format($rst -> Ganancia, 1)."%";
 
                 $Ganancia = $rst->Costo + $Ganancia;
+
+                $r = ($Ganancia - intval($Ganancia))*100; 
+
+                if ($r >= 25){
+                    $Ganancia = ceil($Ganancia);
+                } else {
+                    if ($Ganancia <= 0.3){
+                        $Ganancia = 0.5;
+                    } else {
+                        $Ganancia = floor($Ganancia);
+                    }
+                    
+                }
 
                 $data[] = array(
                     "0" => $rst->Id_Mat,
@@ -153,14 +167,12 @@
 
         // Select de proveedores
         case 'select_Prov';
-            echo "<option value=0>Por definir</option>";
-            /*
-            $sql = ejecutarConsulta("SELECT * FROM Cat_Proveedores ORDER BY Abrev ASC");
+            $sql = ejecutarConsulta("SELECT * FROM Proveedores ORDER BY Nombre ASC");
 
             while ($rst = $sql -> fetch_object()){
                 $dis = $rst -> Status == 'B' ? " disabled " : "";
-                echo "<option value=$rst->Id_Prov $dis>$rst->Nombre</option>";
-            }*/
+                echo "<option class='text-dark' value=$rst->Id $dis>$rst->Nombre</option>";
+            }
             break;
 
         // Caso para validar la existencia de un material

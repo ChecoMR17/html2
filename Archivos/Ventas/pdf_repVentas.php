@@ -11,7 +11,7 @@
 
     if (!empty($Inicio) && !empty($Fin)){ // Filtramos por periodo
         $periodo = $Inicio." A ".$Fin;
-        $sql = ejecutarConsulta("SELECT * FROM Ventas WHERE Fec_Venta >='$Inicio' AND Fec_Venta <= '$Fin'");
+        $sql = ejecutarConsulta("SELECT * FROM Ventas WHERE CONVERT(Fec_Venta,date) >='$Inicio' && CONVERT(Fec_Venta,date) <= '$Fin'");
     } else {
         switch($Filtro){
             case 'Hoy';
@@ -60,6 +60,19 @@
         while($rst2 = $mat -> fetch_object()){
             $Ganancia = $rst2 -> Costo * ($rst2->Ganancia / 100);
             $Precio = $rst2 -> Costo + $Ganancia;
+
+            $r = ($Precio - intval($Precio))*100; 
+
+            if ($r >= 30){
+                $Precio = ceil($Precio);
+            } else {
+                if ($Precio <= 0.3){
+                    $Precio = 0.5;
+                } else {
+                    $Precio = floor($Precio);
+                }
+            }
+
             $Imp = $rst2 -> Cant * $Precio;
 
             $Total += $Imp; // Total de venta actual

@@ -287,6 +287,7 @@ let verFam = (Id_Fam) => {
   )
 }
 
+/*
 $('#Id_Fam').change(function(){
   let Id_Fam = this.value;
   $.post('../Archivos/Cat_Materiales/cat_materiales.php?op=verFam'
@@ -294,6 +295,7 @@ $('#Id_Fam').change(function(){
     , 'json'
   )
 })
+*/
 
 
 // Función par guardar familias

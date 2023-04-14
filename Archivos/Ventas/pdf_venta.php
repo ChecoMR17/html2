@@ -19,6 +19,18 @@
         $Ganancia = $rst -> Costo * ($rst->Ganancia / 100);
         $Costo = $rst -> Costo + $Ganancia;
 
+        $r = ($Costo - intval($Costo))*100; 
+
+        if ($r >= 30){
+            $Costo = ceil($Costo);
+        } else {
+            if ($Costo <= 0.3){
+                $Costo = 0.5;
+            } else {
+                $Costo = floor($Costo);
+            }
+        }
+
         $Imp = $rst -> Cant * $Costo;
         
         $bg = $i % 2 == 0 ? "  " : " bg1 ";

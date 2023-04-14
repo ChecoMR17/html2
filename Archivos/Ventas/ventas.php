@@ -37,21 +37,29 @@
     $Ganancia = isset($_POST['Ganancia']) ? $_POST['Ganancia'] : "";
 
     switch ($_GET['op']){
+        // Caso para retonar el siguiente id de venta
+        case 'Id_Venta':
+            $Id_Venta = ejecutarConsultaSimpleFila("SELECT Id_Venta FROM Ventas ORDER BY Id_Venta DESC LIMIT 1")['Id_Venta'] + 1;
+            echo json_encode($Id_Venta);
+            break;
+
+        // Caso para validar si existe una venta
+        case 'valVenta':
+            $val = ejecutarConsultaSimpleFila("SELECT COUNT(*) Count FROM Ventas WHERE Id_Venta='$Id_Venta'")['Count'];
+            echo json_encode($val);
+            break;
+
+
         case 'save_Venta':
             if (empty($Id_Venta)){
                 $insert = ejecutarConsulta("INSERT INTO Ventas (Id_User, Cliente, Tel, Correo, Direccion, Fec_Alta, Obs, Descuento, Status)
                                             VALUES ('$Id_User','$Cliente','$Tel','$Correo','$Direccion', '$Fecha', '$Obs', 0, 'A');");
-                if ($insert) {
-                    $Id_Venta = ejecutarConsultaSimpleFila("SELECT Id_Venta FROM Ventas ORDER BY Id_Venta DESC LIMIT 1")['Id_Venta'];
-                    echo json_encode(array("Status" => true, "Id_Venta" => floatval($Id_Venta)));
-                } else {
-                    echo json_encode(array("Status" => false, "msg" => "Ocurrió un error al crear la venta :(", "msg2" => "Intentelo nuevamenta mas tarde"));
-                }
+                echo $insert ? "El registro de venta se guardó correctamente" : "Ocurrió un error al guardar el registro de venta :(";
             } else {
                 empty($Descuento) ? $Descuento = 0 : "";
                 $update = ejecutarConsulta("UPDATE Ventas SET Cliente='$Cliente', Tel='$Tel', Correo='$Correo', Direccion='$Direccion'
                                             , Obs='$Obs', Descuento='$Descuento' WHERE Id_Venta='$Id_Venta'");
-                echo json_encode(array("Status" => true, "Id_Venta" => floatval($Id_Venta)));
+                echo $update ? "El registro de venta se actualizo correctamente" : "Ocurrió un error al actualizar el registro de venta :(";
             }
             break;
 
@@ -82,16 +90,18 @@
                 }
 
                 $Sub = $rst -> Total;
+
                 $Total = $Sub - $Imp_Desc;
 
                 $data[] = array(
                     "0" => $rst->Id_Venta,
-                    "1" => $rst->Fec_Venta,
-                    "2" => "$".number_format($Sub, 2),
-                    "3" => "$".number_format($Imp_Desc, 2),
-                    "4" => "$".number_format($Total, 2),
-                    "5" => $Status,
-                    "6" => $btn
+                    "1" => $rst->Cliente,
+                    "2" => $rst->Fec_Venta,                    
+                    "3" => "$".number_format($Sub, 2),
+                    "4" => "$".number_format($Imp_Desc, 2),
+                    "5" => "$".number_format($Total, 2),
+                    "6" => $Status,
+                    "7" => $btn
                 );
             }
 
@@ -118,6 +128,19 @@
             $data = ejecutarConsultaSimpleFila("SELECT CM.*, Abrev UM FROM Cat_Materiales CM LEFT JOIN Cat_Unidad_Medida UM ON (CM.Id_UM2=UM.Id_UM) WHERE Id_Mat=$Id_Mat");
             $Ganancia = $data['Costo'] * ($data['Ganancia'] / 100);
             $data['Cost'] = $data['Costo'] + $Ganancia;
+
+            $r = ($data['Cost'] - intval($data['Cost']))*100; 
+                
+            if ($r >= 30){
+                $data['Cost'] = ceil($data['Cost']);
+            } else {
+                if ($data['Cost'] <= 0.3){
+                    $data['Cost'] = 0.5;
+                } else {
+                    $data['Cost'] = floor($data['Cost']);
+                }
+            }
+
             echo json_encode($data);
             break;
 
@@ -153,11 +176,12 @@
         //caso para listar materiales de venta
         case 'mat_Venta':
             $sql = ejecutarConsulta("SELECT V.*, Desc_Mat, Abrev FROM Ventas_Mat V LEFT JOIN Cat_Materiales M ON (V.Id_Mat=M.Id_Mat)
-                                    LEFT JOIN Cat_Unidad_Medida U ON (Id_UM2=Id_UM) WHERE Id_Venta=$Id_Venta ORDER BY Cons DESC");
+                                    LEFT JOIN Cat_Unidad_Medida U ON (Id_UM2=Id_UM) WHERE Id_Venta='$Id_Venta' ORDER BY Cons DESC");
             $data = array();
-            $Status = ejecutarConsultaSimpleFila("SELECT Status FROM Ventas WHERE Id_Venta=$Id_Venta")['Status'];
 
             while($rst = $sql -> fetch_object()){
+                $Status = ejecutarConsultaSimpleFila("SELECT Status FROM Ventas WHERE Id_Venta=$Id_Venta")['Status'];
+
                 $sts = "";
                 switch($Status) {
                     case 'A': $sts = "<div class='badge badge-info'>En venta</div>"; break;
@@ -185,6 +209,19 @@
 
                 $Ganancia = $rst -> Costo * ($rst->Ganancia / 100);
                 $Costo = $rst -> Costo + $Ganancia;
+
+                $r = ($Costo - intval($Costo))*100; 
+
+                if ($r >= 30){
+                    $Costo = ceil($Costo);
+                } else {
+                    if ($Costo <= 0.3){
+                        $Costo = 0.5;
+                    } else {
+                        $Costo = floor($Costo);
+                    }
+                }
+
                 $Imp = $rst -> Cant * $Costo;
 
                 $data[] = array(
@@ -219,6 +256,19 @@
                 $Ganancia = $rst -> Costo * ($rst->Ganancia / 100);
 
                 $Costo = $rst->Costo + $Ganancia;
+
+                $r = ($Costo - intval($Costo))*100; 
+                
+                if ($r >= 30){
+                    $Costo = ceil($Costo);
+                } else {
+                    if ($Costo <= 0.3){
+                        $Costo = 0.5;
+                    } else {
+                        $Costo = floor($Costo);
+                    }
+                }
+
                 $Imp = $rst -> Cant * $Costo;
                 $Total += $Imp;
             }
@@ -285,7 +335,7 @@
 
         // Caso para devolver materiales
         case 'devMat':
-            $dev = ejecutarConsulta("UPDATE Ventas_Mat SET Devolucion='$Devolucion', Fec_Dev='$Fecha'
+            $dev = ejecutarConsulta("UPDATE Ventas_Mat SET Cant=Cant-$Devolucion, Devolucion='$Devolucion', Fec_Dev='$Fecha'
                     WHERE Id_Venta=$Id_Venta AND Id_Mat=$Id_Mat AND Cons=$Cons");
             if ($dev){
                 ejecutarConsulta("UPDATE Cat_Materiales SET Stock=Stock+$Cant WHERE Id_Mat=$Id_Mat");
@@ -304,7 +354,7 @@
 
             if ($Filtro ==''){ // Filtramos por periodo
                 $Total = ejecutarConsultaSimpleFila("SELECT SUM(Total - Total*(Descuento/100)) Total FROM Ventas
-                        WHERE Fec_Venta >='$Inicio' && Fec_Venta <= '$Fin'")['Total'];
+                        WHERE CONVERT(Fec_Venta,date) >='$Inicio' && CONVERT(Fec_Venta,date) <= '$Fin'")['Total'];
             } else {
                 switch($Filtro){
                     case 'Hoy'; $Filtro = "WHERE Fec_Venta LIKE '%".date('Y-m-d')."%'"; break;
@@ -318,6 +368,59 @@
             }
 
             echo "$".number_format($Total, 2);            
+            break;
+
+        // caso para editar el precio de un material
+        case 'editPU':
+            $edit = ejecutarConsulta("UPDATE Cat_Materiales SET Ganancia='$Ganancia' WHERE Id_Mat=$Id_Mat");
+            echo $edit? "El precio del artículo se actualizó correctamente" : "Ocurrió un error al actualizar el precio del artículo :(";
+            break;
+
+        // Caso para listado de materiales
+        case 'listar_Mat':
+            $sql = ejecutarConsulta("SELECT CM.*, Abrev UM FROM Cat_Materiales CM LEFT JOIN Cat_Unidad_Medida UM ON (CM.Id_UM2=UM.Id_UM)");
+            $data = array();
+
+            while($rst = $sql -> fetch_object()){      
+                $btn = "<div class='text-center'>
+                    <button class='btn btn-sm btn-outline-info' onclick='verMat($rst->Id_Mat)'><i class='fa-regular fa-hand-pointer fa-beat'></i></button>
+                </div>";
+                $Ganancia = $rst->Costo * ($rst->Ganancia / 100);
+
+                $Gan = "$".number_format($Ganancia, 2);
+                $Por = number_format($rst -> Ganancia, 1)."%";
+
+                $Ganancia = $rst->Costo + $Ganancia;
+
+                $r = ($Ganancia - intval($Ganancia))*100; 
+
+                if ($r >= 25){
+                    $Ganancia = ceil($Ganancia);
+                } else {
+                    if ($Ganancia <= 0.3){
+                        $Ganancia = 0.5;
+                    } else {
+                        $Ganancia = floor($Ganancia);
+                    }                    
+                }
+
+                $data[] = array(
+                    "0" => $btn,
+                    "1" => "<div onclick='verMat($rst->Id_Mat)'>$rst->Desc_Mat</div>",
+                    "2" => "<div onclick='verMat($rst->Id_Mat)'>$rst->UM</div>",
+                    "3" => "<div onclick='verMat($rst->Id_Mat)'>".number_format($rst -> Stock, 2)."</div>",
+                    "4" => "<div onclick='verMat($rst->Id_Mat)'>$".number_format($Ganancia, 2)."</div>",
+                );
+            }
+
+            $results = array(
+                "sEcho" => 1, //Información para el datatables
+                "iTotalRecords" => count($data), //enviamos el total registros al datatable
+                "iTotalDisplayRecords" => count($data), //enviamos el total registros a visualizar
+                "aaData" => $data
+            );
+
+            echo json_encode($results);
             break;
     }
 

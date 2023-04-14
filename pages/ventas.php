@@ -1,6 +1,7 @@
-<?php 
-session_start();
-include('../global/Header.php') ?>
+<?php
+    session_start();
+    include('../global/Header.php');
+?>
 
     <!--    Título    -->
     <title>Ventas</title>
@@ -31,7 +32,7 @@ include('../global/Header.php') ?>
         <div class="box"> 
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="divProgramaciones">
                 <div class="d-flex justify-content-center row">
-                    <h2>Ventas <button class='btn btn-outline-success' id='btnAdd'>Agregar <i class="fa-solid fa-cart-plus fa-beat"></i></button>
+                    <h2>Ventas <button class='btn btn-outline-success btn-sm' id='btnAdd'>Agregar <i class="fa-solid fa-cart-plus fa-beat"></i></button>
                     </h2>
                 </div>
 
@@ -143,36 +144,72 @@ include('../global/Header.php') ?>
                                 <input type="number" min=0 placeholder='0.00' id='Cant' name='Cant' class='form-control form-control-sm' required>
                             </div>
 
-                            <div class="form-group col-xs-1 mt-4" title="Finalizar venta">
+                            <div class="form-group col-xs-1 mt-4" title="Agregar articulo">
                                 <button type="submit" class="btn btn-outline-success btn-sm mt-2" id='btnAddMat'>Agregar <i class="fa-solid fa-cart-plus fa-beat"></i></button>
+                            </div>
+
+                            <div class="form-group col-xs-1 mt-4" title="Editar precio">
+                                <button type="button" class="btn btn-outline-warning text-dark btn-sm mt-2" id='editPU'>Editar <i class="fa-solid fa-dollar-sign fa-beat"></i></button>
                             </div>
                         </div>
                     </form>
 
+                    <ul class="nav nav-tabs d-flex justify-content-center" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="home-tab" data-toggle="tab" data-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Material en venta</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="profile-tab" data-toggle="tab" data-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Inventario</button>
+                        </li>
+                    </ul>
+|
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <div class="table-responsive col-12 mt-1 mb-5">
+                                <table class="table table-sm table-hover table-striped compact" id="tbl_Mat">
+                                    <thead class="text-center bg-success text-white">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Material</th>
+                                            <th>UM</th>
+                                            <th>Cant</th>
+                                            <th>PU</th>
+                                            <th>Importe</th>
+                                            <th>Status</th>
+                                            <th>Opciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>  
+                        </div>
 
-                    <div class="table-responsive col-12 mt-5 mb-5">
-                        <table class="table table-sm table-hover table-striped compact" id="tbl_Mat">
-                            <thead class="text-center bg-success text-white">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Material</th>
-                                    <th>UM</th>
-                                    <th>Cant</th>
-                                    <th>PU</th>
-                                    <th>Importe</th>
-                                    <th>Status</th>
-                                    <th>Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+
+                            <div class="table-responsive mt-1 col-12">
+                                <table class="table table-sm table-hover table-striped compact" id="tbl_Materiales">
+                                    <thead class="text-center bg-success text-white">
+                                        <tr>
+                                            <th>Seleccionar</th>
+                                            <th>Material</th>
+                                            <th>UM</th>
+                                            <th>Stock</th>
+                                            <th>PU</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+                    
                 </div>
                 
                 <div class="table-responsive col-12" id='div_Ventas'>
+
                     <div class="alert alert-success" role="alert">
                         <div class='form-row d-felx justify-content-around text-center'>
-                            <div class="form-group col-xs-1">
+                            <div class=form-group col-xs-1">
                                 <label for="Filtro">Filtro</label>
                                 <select name="Filtro" id="Filtro" data-size='6' class="form-control form-control-sm bg-transparent rounded-pill">
                                     <option value="Hoy">Hoy</option>
@@ -183,25 +220,26 @@ include('../global/Header.php') ?>
                                 </select>
                             </div>
 
-                            <div class="form-group col-xs-1">
+                            <div class=form-group col-xs-1">
                                 <label for="Inicio">Inicio</label>
                                 <input Id='Inicio' name='Inicio' type="date" class="form-control form-control-sm bg-transparent rounded-pill">
                             </div>
 
-                            <div class="form-group col-xs-1">
+                            <div class=form-group col-xs-1">
                                 <label for="Fin">Fin</label>
                                 <input Id='Fin' name='Fin' type="date" class="form-control form-control-sm bg-transparent rounded-pill">
                             </div>
 
-                            <div class="form-group col-xs-1">
+                            <div class=form-group col-xs-1">
                                 <label>Vendido</label>
                                 <label id="Vendido" class="form-control bg-transparent rounded-pill">$0.00</label>
                             </div>
 
-                            <div class="form-group col-xs-1" title='Imprimir reporte de venta'>
+                            <div class=form-group col-xs-1" title='Imprimir reporte de venta'>
                                 <button class="btn btn-outline-danger btn-sm mt-4" id="btnRep">Imprimir <i class="fa-solid fa-file-pdf fa-beat"></i></button>
                             </div>
                         </div>
+                        
                     </div>
 
 
@@ -209,6 +247,7 @@ include('../global/Header.php') ?>
                         <thead class="text-center bg-success text-white">
                             <tr>
                                 <th>No</th>
+                                <th>Cliente</th>
                                 <th>Fecha de Venta</th>
                                 <th>Subtotal</th>
                                 <th>Descuento</th>
@@ -265,6 +304,46 @@ include('../global/Header.php') ?>
                     </div>
                 </div>
             </div>
+
+            <!--    Modal para agregar ModalPU    -->
+            <div class="modal fade" id="ModalPU" data-keyboard="false" tabindex="-1" aria-labelledby="ModalPULabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-light">
+                            <h6 class="modal-title" id="ModalPULabel"><i class="fa-solid fa-warehouse"></i> ModalPU</h6>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form class='was-validated' id='formModalPU'>
+                                <div class="form-row">
+                                    <div class="form-group col-lg-2 col-md-4 col-sm-6 col-12" title="Precio de venta">
+                                        <label for="Gan">Ganancia <span class="text-danger">*</span></label>
+                                        <input type="number" min=0 class="form-control form-control-sm" id="Gan" placeholder='0.00%' name="Ganancia" step="any" required>
+                                    </div>
+
+                                    <div class="form-group col-lg-10 col-md-8 col-sm-6 col-12" title="Familia">
+                                        <label for="PU">Nuevo precio</label>
+                                        <input type="text" class="form-control form-control-sm" id="PU" name="PU" placeholder='$0.00' readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-row d-flex justify-content-center">
+                                    <div class="form-group col-xs-1" title="Guardar">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Guardar <i class="fas fa-save fa-beat"></i></button>
+                                    </div>
+
+                                    <div class="form-group col-xs-1" title="Cerrar ventana">
+                                        <button type="button" class="btn btn-sm btn-outline-dark" data-dismiss="modal">Cancelar <i class="fas fa-times-circle fa-beat"></i></button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             
             <!--    BOTON IR ARRIBA  -->
             <span class="ir-arriba" title="Subir"><i class="fas fa-chevron-up"></i></span>
